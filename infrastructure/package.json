@@ -1,0 +1,22 @@
+{
+  "name": "aws-managed-flink",
+  "version": "1.0.0",
+  "bin": {
+    "msf": "bin/msf.js"
+  }
+  "description": "Infrastructure for an AWS Managed Flink Job",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "aws-cdk": "*",
+    "typescript": "~5.1.6"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "*",
+    "constructs": "^10.0.0"
+  }
+}
