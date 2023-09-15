@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "bin": {
     "msf": "bin/msf.js"
-  }
+  },
   "description": "Infrastructure for an AWS Managed Flink Job",
   "scripts": {
     "build": "tsc",
@@ -13,10 +13,13 @@
   "devDependencies": {
     "@types/node": "^20",
     "aws-cdk": "*",
-    "typescript": "~5.1.6"
+    "typescript": "~5.2.2",
+    "ts-node": "10.9.1"
   },
   "dependencies": {
+    "@aws-cdk/aws-glue": "1.199.0",
     "aws-cdk-lib": "*",
-    "constructs": "^10.0.0"
+    "cdk-bootstrapless-synthesizer": "^2.3.2",
+    "constructs": "^10.2.70"
   }
 }

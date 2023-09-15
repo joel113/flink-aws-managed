@@ -9,3 +9,5 @@ https://github.com/awslabs/managed-service-for-apache-flink-blueprints/blob/main
 ## AWS CDK
 
 https://github.com/aws-samples/aws-cdk-examples/tree/master
+
+https://github.com/aws-samples/cdk-bootstrapless-synthesizer
