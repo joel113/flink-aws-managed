@@ -4,16 +4,11 @@ import { StackProps } from "aws-cdk-lib";
 import * as flink from '@aws-cdk/aws-kinesisanalytics-flink-alpha'
 import { Construct } from 'constructs';
 
-export enum MsfRuntimeEnvironment {
-  FLINK_1_17 = "FLINK-1_17"
-}
-
 export interface MsfScalaAppProps extends StackProps {
   account: string;
   region: string;
   partition: string;
   appName: string;
-  runtimeEnvironment: MsfRuntimeEnvironment,
   serviceExecutionRole: string;
   bucketName: string;
   jarFile: string;
