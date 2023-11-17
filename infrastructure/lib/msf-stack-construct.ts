@@ -114,7 +114,7 @@ export class MsfStack extends cdk.Stack {
       account: this.account,
       region: this.region,
       partition: this.partition,
-      appName: cfnParams.get("AppName")!.valueAsString,
+      appName: "kinesis-to-s3-scala-app",
       runtimeEnvironment: MsfRuntimeEnvironment.FLINK_1_17,
       serviceExecutionRole: appRole.roleArn,
       bucketName: cfnParams.get("BucketName")!.valueAsString,
