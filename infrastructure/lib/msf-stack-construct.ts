@@ -5,22 +5,19 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { aws_logs as logs } from 'aws-cdk-lib';
 import { aws_kinesis as kinesis } from 'aws-cdk-lib';
 import { StreamMode } from 'aws-cdk-lib/aws-kinesis';
-import { MsfJavaApp, MsfRuntimeEnvironment } from './msf-java-app-construct';
-import { AppStartLambdaConstruct } from './msf-start-lambda-construct';
-import { KdsDataGenLambdaConstruct } from  './kds-datagen-lambda-construct'
+import { MsfScalaApp, MsfRuntimeEnvironment } from './msf-scala-app-construct';
 
 export interface GlobalProps extends StackProps {
 }
 
-export class MsfJavaAppStack extends cdk.Stack {
+export class MsfStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: GlobalProps) {
     super(scope, id, props);
 
     // we'll be generating a CFN script so we need CFN params
     let cfnParams = this.getParams();
 
-    // create cw log group and log stream
-    // so it can be used when creating the Flink app
+    // logs groups for the logging of the flink app
     const logGroup = new logs.LogGroup(this, 'LogGroup', {
       logGroupName: cfnParams.get("CloudWatchLogGroupName")!.valueAsString,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -37,7 +34,7 @@ export class MsfJavaAppStack extends cdk.Stack {
       retentionPeriod: cdk.Duration.hours(cfnParams.get("RetentionPeriodHours")!.valueAsNumber)
     });
 
-    // our Flink app needs to be able to log
+    // iam policy to allow to write logs into the log groups
     const accessCWLogsPolicy = new iam.PolicyDocument({
       statements: [
         new iam.PolicyStatement({
@@ -50,7 +47,7 @@ export class MsfJavaAppStack extends cdk.Stack {
       ],
     });
 
-    // our Flink app needs to be able to write metrics
+    // iam policy to allow to write metrics into cloudwatch
     const accessCWMetricsPolicy = new iam.PolicyDocument({
       statements: [
         new iam.PolicyStatement({
@@ -60,8 +57,7 @@ export class MsfJavaAppStack extends cdk.Stack {
       ],
     });
 
-    // our Flink app needs access to read application jar from S3
-    // as well as to write to S3 (from FileSink)
+    // iam policy to access the application jar from S3 as well as to write to S3
     const accessS3Policy = new iam.PolicyDocument({
       statements: [
         new iam.PolicyStatement({
@@ -75,7 +71,7 @@ export class MsfJavaAppStack extends cdk.Stack {
       ],
     });
 
-    // our Flink app needs to be able to read from the source Kinesis Data Stream
+    // iam policy to read from the source kinesis data stream
     const accessKdsPolicy = new iam.PolicyDocument({
       statements: [
         new iam.PolicyStatement({
@@ -90,6 +86,7 @@ export class MsfJavaAppStack extends cdk.Stack {
       ],
     });
 
+    // iam role to run the flink application
     const appRole = new iam.Role(this, 'flink-app-role', {
       roleName: cfnParams.get("RoleName")!.valueAsString,
       assumedBy: new iam.ServicePrincipal('kinesisanalytics.amazonaws.com'),
@@ -104,7 +101,7 @@ export class MsfJavaAppStack extends cdk.Stack {
 
     const flinkApplicationProps = {
       "StackId": this.stackId,
-      "BlueprintName": "KDS_FLINK-DATASTREAM-JAVA_S3",
+      "BlueprintName": "FLINK-SCALA-KINESIS-TO-S3",
       "StreamName": kinesisStream.streamName,
       "BucketName": `s3://${cfnParams.get("BucketName")!.valueAsString}/`,
       "AWSRegion": this.region,
@@ -113,12 +110,12 @@ export class MsfJavaAppStack extends cdk.Stack {
       "BootstrapStackName": cfnParams.get("BootstrapStackName")!.valueAsString,
     };
 
-    const app = new MsfJavaApp(this, "kds-to-s3-java-app-test", {
+    const app = new MsfScalaApp(this, "kinesis-to-s3-scala-app", {
       account: this.account,
       region: this.region,
       partition: this.partition,
       appName: cfnParams.get("AppName")!.valueAsString,
-      runtimeEnvironment: MsfRuntimeEnvironment.FLINK_1_15,
+      runtimeEnvironment: MsfRuntimeEnvironment.FLINK_1_17,
       serviceExecutionRole: appRole.roleArn,
       bucketName: cfnParams.get("BucketName")!.valueAsString,
       jarFile: cfnParams.get("JarFile")!.valueAsString,
@@ -126,38 +123,6 @@ export class MsfJavaAppStack extends cdk.Stack {
       logGroupName: logGroup.logGroupName, 
       applicationProperties: flinkApplicationProps,
     });
-
-    // Configure app start lambda to automatically start the Flink app
-    const appStartLambdaFnConstruct = new AppStartLambdaConstruct(this, 'AppStartLambda', {
-      account: this.account,
-      region: this.region,
-      appName: cfnParams.get("AppName")!.valueAsString
-    });
-
-    const appStartCustomResource = new cdk.CustomResource(this, 'AppStartLambdaResource', {
-      serviceToken: appStartLambdaFnConstruct.appStartLambdaFn.functionArn,
-      properties:
-      {
-        AppName: cfnParams.get("AppName")!.valueAsString
-,
-      }
-    });
-
-    appStartCustomResource.node.addDependency(app);
-
-    // 👇 create an output for app start response
-    const response = appStartCustomResource.getAtt('Message').toString();
-    const appStartResponseOutput = new cdk.CfnOutput(this, 'AppStartResponseOutput', {
-      value: response,
-    });
-
-    appStartResponseOutput.node.addDependency(appStartLambdaFnConstruct.appStartLambdaFn);
-    appStartResponseOutput.node.addDependency(appStartCustomResource);
-
-    new KdsDataGenLambdaConstruct(this, "KdsDataGenLambda", {
-      streamArn: kinesisStream.streamArn,
-      numberOfItems: cfnParams.get("NumberOfItems")!.valueAsNumber,
-    })
 
   }
 
@@ -201,13 +166,13 @@ export class MsfJavaAppStack extends cdk.Stack {
 
     params.set("JarFile", new cdk.CfnParameter(this, "JarFile", {
       type: "String",
-      default: "kds-to-s3-datastream-java-1.0.1.jar",
+      default: "kds-to-s3-datastream-Scala-1.0.1.jar",
       description: "S3 key for .jar file containing the app (must exist in bucket specified in BucketName parameter)"
     }));
 
     params.set("RuntimeEnvironment", new cdk.CfnParameter(this, "RuntimeEnvironment", {
       type: "String",
-      default: "FLINK-1_15",
+      default: "FLINK-1_17",
       description: "Flink runtime environment"
     }));
 

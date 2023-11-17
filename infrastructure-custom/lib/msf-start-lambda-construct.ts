@@ -17,12 +17,10 @@ export class AppStartLambdaConstruct extends Construct {
     constructor(scope: Construct, id: string, props: AppStartLambdaConstructProps) {
         super(scope, id);
 
-
-        // Run app start lambda
         this.appStartLambdaFn = new lambda.SingletonFunction(this, 'AppStartFunction', {
             uuid: '97e4f730-4ee1-11e8-3c2d-fa7ae01b6ebc',
             lambdaPurpose: "Start MSF Application",
-            code: lambda.Code.fromInline(readFileSync(`${__dirname}/../../../python/lambda_msf_app_start.py`, "utf-8")),
+            code: lambda.Code.fromInline(readFileSync(`${__dirname}/../python/lambda_msf_app_start.py`, "utf-8")),
             handler: "index.handler",
             initialPolicy: [
                 new iam.PolicyStatement(
@@ -35,7 +33,7 @@ export class AppStartLambdaConstruct extends Construct {
             ],
             timeout: cdk.Duration.seconds(600),
             runtime: lambda.Runtime.PYTHON_3_9,
-            memorySize: 1024, // need extra memory for kafka-client
+            memorySize: 1024,
         });
       }
 }

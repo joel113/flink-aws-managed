@@ -20,7 +20,7 @@ export class KdsDataGenLambdaConstruct extends Construct {
         // Run KDS DataGen Lambda
         this.kdsDataGenLambdaFn = new lambda.SingletonFunction(this, 'KdsDataGenFunction', {
             uuid: "e7e4ed0b-1438-4552-94ae-5edfb84ac21c",
-            code: lambda.Code.fromInline(readFileSync(`${__dirname}/../../../python/lambda_kds_datagen.py`, "utf-8")),
+            code: lambda.Code.fromInline(readFileSync(`${__dirname}/../python/lambda_kds_datagen.py`, "utf-8")),
             handler: "index.handler",
             initialPolicy: [
                 new iam.PolicyStatement(

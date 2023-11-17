@@ -6,14 +6,10 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as iam from 'aws-cdk-lib/aws-iam';
 
 export enum MsfRuntimeEnvironment {
-    FLINK_1_11 = "FLINK-1_11",
-    FLINK_1_13 = "FLINK-1_13",
-    FLINK_1_15 = "FLINK-1_15",
-    FLINK_1_6 = "FLINK-1_6",
-    FLINK_1_8 = "FLINK-1_8",
-
+    FLINK_1_17 = "FLINK-1_17"
 }
-export interface MsfJavaAppProps extends StackProps {
+
+export interface MsfScalaAppProps extends StackProps {
     account: string;
     region: string;
     partition: string;
@@ -34,20 +30,20 @@ export interface MsfJavaAppProps extends StackProps {
     applicationProperties?: Object;
 }
 
-// MsfJavaApp construct is used to create a new Java blueprint application.
+// MsfScalaApp construct is used to create a new Scala blueprint application.
 // This construct is used instead of official CDK construct because official
 // CDK construct does not support configuring CW logs during creation.
 // Configuring CW logs with official CDK construct results in an update
 // to the application which changes its initial version to 2. This is not 
 // desired for blueprints functionality in AWS console.
-export class MsfJavaApp extends Construct {
-    constructor(scope: Construct, id: string, props: MsfJavaAppProps) {
+export class MsfScalaApp extends Construct {
+    constructor(scope: Construct, id: string, props: MsfScalaAppProps) {
         super(scope, id);
 
-        const fn = new lambda.SingletonFunction(this, 'MsfJavaAppCustomResourceHandler', {
+        const fn = new lambda.SingletonFunction(this, 'MsfScalaAppCustomResourceHandler', {
             uuid: 'c4e1d42d-595a-4bd6-99e9-c299b61f2358',
-            lambdaPurpose: "Deploy an MSF app created created with Java",
-            code: lambda.Code.fromInline(readFileSync(`${__dirname}/../../../python/msf_java_app_custom_resource_handler.py`, "utf-8")),
+            lambdaPurpose: "Deploy an MSF app created with Scala",
+            code: lambda.Code.fromInline(readFileSync(`${__dirname}/../python/msf_scala_app_custom_resource_handler.py`, "utf-8")),
             handler: "index.handler",
             initialPolicy: [
                 new iam.PolicyStatement(
@@ -92,7 +88,7 @@ export class MsfJavaApp extends Construct {
 
         const logStreamArn = `arn:${props.partition}:logs:${props.region}:${props.account}:log-group:${props.logGroupName}:log-stream:${props.logStreamName}`;
         const bucketArn = `arn:${props.partition}:s3:::${props.bucketName}`;
-        new cdk.CustomResource(this, `MSFJavaApp${id}`, {
+        new cdk.CustomResource(this, `MSFScalaApp${id}`, {
             serviceToken: fn.functionArn,
             properties:
             {
