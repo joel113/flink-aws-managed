@@ -15,7 +15,7 @@ export class MsfStack extends cdk.Stack {
     super(scope, id, props);
 
     // we'll be generating a CFN script so we need CFN params
-    let cfnParams = this.getParams();
+    const cfnParams = this.getParams();
 
     // logs groups for the logging of the flink app
     const logGroup = new logs.LogGroup(this, 'LogGroup', {
@@ -110,7 +110,7 @@ export class MsfStack extends cdk.Stack {
       "BootstrapStackName": cfnParams.get("BootstrapStackName")!.valueAsString,
     };
 
-    const app = new MsfScalaApp(this, "kinesis-to-s3-scala-app", {
+    new MsfScalaApp(this, "kinesis-to-s3-scala-app", {
       account: this.account,
       region: this.region,
       partition: this.partition,
@@ -127,7 +127,7 @@ export class MsfStack extends cdk.Stack {
   }
 
   getParams(): Map<string, cdk.CfnParameter> {
-    let params = new Map<string, cdk.CfnParameter>();
+    const params = new Map<string, cdk.CfnParameter>();
 
     params.set("AppName", new cdk.CfnParameter(this, "AppName", {
       type: "String",

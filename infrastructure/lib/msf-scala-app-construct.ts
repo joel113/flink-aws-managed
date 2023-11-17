@@ -21,12 +21,12 @@ export interface MsfScalaAppProps extends StackProps {
   logGroupName: string;
   subnets?: string[];
   securityGroups?: string[];
-  parallelism?: Number;
-  parallelismPerKpu?: Number;
-  autoscalingEnabled?: Boolean;
-  checkpointInterval?: Number;
-  minPauseBetweenCheckpoints?: Number;
-  applicationProperties?: Object;
+  parallelism?: number;
+  parallelismPerKpu?: number;
+  autoscalingEnabled?: boolean;
+  checkpointInterval?: number;
+  minPauseBetweenCheckpoints?: number;
+  applicationProperties?: object;
 }
 
 export class MsfScalaApp extends Construct {
@@ -34,9 +34,9 @@ export class MsfScalaApp extends Construct {
       super(scope, id);
 
       const app = new core.App();
-      const stack = new core.Stack(app, 'MsfScalaApp');
+      const stack = new core.Stack(app, props.appName);
 
-      new flink.Application(stack, 'MsfScalaApp', {
+      new flink.Application(stack, props.appName, {
         code: flink.ApplicationCode.fromAsset(path.join(__dirname, '../../flink/target/foobar.jar')),
         runtime: flink.Runtime.FLINK_1_15,
       });
