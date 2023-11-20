@@ -32,7 +32,9 @@ export class MsfScalaApp extends Construct {
       const stack = new core.Stack(app, props.appName);
 
       new flink.Application(stack, props.appName, {
-        code: flink.ApplicationCode.fromAsset(path.join(__dirname, '../../flink/target/foobar.jar')),
+        code: flink.ApplicationCode.fromAsset(path.join(__dirname, '../../flink/kds-to-s3-datastream-scala/target/kds-to-s3-datastream-scala-1.0.0.jar')),
+        applicationName: props.appName,
+        // TODO: implement properties
         runtime: flink.Runtime.FLINK_1_15,
       });
 

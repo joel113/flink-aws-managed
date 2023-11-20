@@ -5,7 +5,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { aws_logs as logs } from 'aws-cdk-lib';
 import { aws_kinesis as kinesis } from 'aws-cdk-lib';
 import { StreamMode } from 'aws-cdk-lib/aws-kinesis';
-import { MsfScalaApp, MsfRuntimeEnvironment } from './msf-scala-app-construct';
+import { MsfScalaApp } from './msf-scala-app-construct';
 
 export interface GlobalProps extends StackProps {
 }
@@ -115,7 +115,6 @@ export class MsfStack extends cdk.Stack {
       region: this.region,
       partition: this.partition,
       appName: "kinesis-to-s3-scala-app",
-      runtimeEnvironment: MsfRuntimeEnvironment.FLINK_1_17,
       serviceExecutionRole: appRole.roleArn,
       bucketName: cfnParams.get("BucketName")!.valueAsString,
       jarFile: cfnParams.get("JarFile")!.valueAsString,
