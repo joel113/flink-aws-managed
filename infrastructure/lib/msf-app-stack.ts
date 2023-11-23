@@ -1,9 +1,8 @@
-import * as path from 'path';
 import * as core from 'aws-cdk-lib'
-import * as iam from 'aws-cdk-lib/aws-iam';
-import { aws_logs as logs } from 'aws-cdk-lib';
-import { NestedStackProps } from "aws-cdk-lib";
 import * as flink from '@aws-cdk/aws-kinesisanalytics-flink-alpha'
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as path from 'path';
+import { NestedStackProps, aws_logs as logs } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 export interface MsfAppProps extends NestedStackProps {

@@ -1,10 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
-import { StackProps } from 'aws-cdk-lib';
+import * as flink from '@aws-cdk/aws-kinesisanalytics-flink-alpha'
 import { Construct } from 'constructs';
 import { MsfApp } from './msf-app-stack';
-import * as flink from '@aws-cdk/aws-kinesisanalytics-flink-alpha'
-import { MsfInfra } from './msf-infra-stack';
 import { MsfIam } from './msf-iam-stack';
+import { MsfInfra } from './msf-infra-stack';
+import { StackProps } from 'aws-cdk-lib';
 
 export interface MsfStackProps extends StackProps {
   readonly appName: string;

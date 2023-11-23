@@ -1,8 +1,8 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { MsfStack } from '../lib/msf-stack-construct';
 import * as flink from '@aws-cdk/aws-kinesisanalytics-flink-alpha'
 import { BootstraplessStackSynthesizer } from 'cdk-bootstrapless-synthesizer';
+import { MsfStack } from '../lib/msf-stack-construct';
 
 const app = new cdk.App();
 

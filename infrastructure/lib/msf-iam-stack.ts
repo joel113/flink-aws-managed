@@ -1,8 +1,8 @@
 import * as cdk from 'aws-cdk-lib';
 import * as core from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import { NestedStackProps } from "aws-cdk-lib";
 import { Construct } from 'constructs';
+import { NestedStackProps } from "aws-cdk-lib";
 
 export interface MsfIamProps extends NestedStackProps {
   readonly logGroupArn: string;

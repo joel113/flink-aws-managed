@@ -1,12 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import * as core from 'aws-cdk-lib';
-import { aws_logs as logs } from 'aws-cdk-lib';
-import { aws_kinesis as kinesis } from 'aws-cdk-lib';
-import { aws_s3 as s3 } from 'aws-cdk-lib';
-import { CfnOutput } from 'aws-cdk-lib';
-import { StreamMode } from 'aws-cdk-lib/aws-kinesis';
-import { NestedStackProps } from "aws-cdk-lib";
+import { CfnOutput, NestedStackProps } from "aws-cdk-lib";
 import { Construct } from 'constructs';
+import { aws_kinesis as kinesis } from 'aws-cdk-lib';
+import { aws_logs as logs } from 'aws-cdk-lib';
+import { aws_s3 as s3 } from 'aws-cdk-lib';
 
 export interface MsfInfraProps extends NestedStackProps {
   readonly streamName: string,
@@ -38,7 +36,7 @@ export class MsfInfra extends core.NestedStack {
 
     this.kinesisStream = new kinesis.Stream(this, 'SourceKinesisStream', {
       streamName: props.streamName,
-      streamMode: StreamMode.ON_DEMAND,
+      streamMode: kinesis.StreamMode.ON_DEMAND,
       retentionPeriod: cdk.Duration.hours(props.retentionPeriodHours),
     });
 
