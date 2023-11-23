@@ -11,6 +11,7 @@ import org.apache.flink.formats.parquet.{ParquetBuilder, ParquetWriterFactory}
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.OnCheckpointRollingPolicy
 import org.apache.flink.streaming.connectors.kinesis.FlinkKinesisConsumer
+import org.apache.flink.streaming.connectors.kinesis.config.ConsumerConfigConstants
 import org.apache.flink.util.Collector
 import org.apache.parquet.avro.AvroParquetWriter
 import org.apache.parquet.hadoop.ParquetWriter
@@ -25,11 +26,10 @@ object StreamPipeline {
 
   private final val LOG = LoggerFactory.getLogger(StreamPipeline.getClass)
   private final val FLINK_APPLICATION_PROPERTIES = "BluePrintMetadata"
-  private final val KINESIS_STREAM_NAME = "StreamName"
-  private final val AWS_REGION = "AWSRegion"
-  private final val STREAM_INITIAL_POSITION = "StreamInitialPosition"
-  private final val S3_DEST_KEY = "BucketName"
-  private final val PARTITION_FORMAT_KEY = "PartitionFormat"
+  private final val KINESIS_STREAM_NAME = "streamName"
+  private final val AWS_REGION = "region"
+  private final val STREAM_INITIAL_POSITION = "streamInitialPosition"
+  private final val S3_DEST_KEY = "bucketName"
 
   private def getAppProperties: Option[Properties] = {
     val applicationProperties = KinesisAnalyticsRuntime.getApplicationProperties()
@@ -54,21 +54,29 @@ object StreamPipeline {
       LOG.error("Unable to retrieve property " + S3_DEST_KEY)
       None
     }
-    else if(!flinkProperties.containsKey(PARTITION_FORMAT_KEY)) {
-      LOG.error("Unable to retrieve property " + PARTITION_FORMAT_KEY)
-      None
-    }
     else {
       Some(flinkProperties)
     }
   }
 
-  private def getKinesisSource(env: StreamExecutionEnvironment, properties: Option[Properties]): FlinkKinesisConsumer[Stock] = {
-    val consumerConfig = new Properties()
-    consumerConfig.put(AWSConfigConstants.AWS_REGION, "eu-central-1")
+  private def getKinesisSource(properties: Option[Properties]): FlinkKinesisConsumer[Stock] = {
+    val streamName = properties match {
+      case Some(value) => value.get(KINESIS_STREAM_NAME).toString
+      case None =>
+        LOG.error("Unable to set property " + KINESIS_STREAM_NAME)
+        throw new RuntimeException(KINESIS_STREAM_NAME + " property not available")
+    }
     val deserializationSchema = new StockDeserializationSchema()
-    // TODO: implement properties
-    new FlinkKinesisConsumer[Stock]("myKinesisStream", deserializationSchema, consumerConfig)
+    val consumerConfig = new Properties()
+    consumerConfig.put(AWSConfigConstants.AWS_REGION, properties match {
+      case Some(value) => value.get(AWS_REGION)
+      case None => "eu-central-1"
+    })
+    consumerConfig.put(ConsumerConfigConstants.STREAM_INITIAL_POSITION, properties match {
+      case Some(value) => value.get(STREAM_INITIAL_POSITION)
+      case None => "TRIM_HORIZON"
+    })
+    new FlinkKinesisConsumer[Stock](streamName, deserializationSchema, consumerConfig)
   }
 
   private def getParquetWriter = {
@@ -85,7 +93,7 @@ object StreamPipeline {
     })
   }
 
-  private def getFileSink(environment: StreamExecutionEnvironment, maybeProperties: Option[Properties]): FileSink[Stock] = {
+  private def getFileSink: FileSink[Stock] = {
     val outputPath = "/tmp/flinkout"
     val partitionFormat = "yyyy-MM-dd-HH"
     val path = new Path(outputPath)
@@ -99,9 +107,9 @@ object StreamPipeline {
   }
 
   private def runAppWithKinesisSource(env: StreamExecutionEnvironment, properties: Option[Properties]): Unit = {
-    val source = getKinesisSource(env, properties)
+    val source = getKinesisSource(properties)
     val stream = env.addSource(source)
-    val sink = getFileSink(env, properties)
+    val sink = getFileSink
     stream.flatMap((stock: Stock, collector: Collector[Stock]) => {
       if (stock.price >= 1) {
         collector.collect(stock)

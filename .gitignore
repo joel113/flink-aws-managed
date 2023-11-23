@@ -270,3 +270,5 @@ all_vehicles_json.txt
 
 .DS_Store
 __pycache__
+
+.metals
