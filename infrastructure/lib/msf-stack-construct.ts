@@ -2,7 +2,6 @@ import * as cdk from 'aws-cdk-lib';
 import * as flink from '@aws-cdk/aws-kinesisanalytics-flink-alpha'
 import { Construct } from 'constructs';
 import { MsfApp } from './msf-app-stack';
-import { MsfIam } from './msf-iam-stack';
 import { MsfInfra } from './msf-infra-stack';
 import { StackProps } from 'aws-cdk-lib';
 
@@ -31,13 +30,11 @@ export class MsfStack extends cdk.Stack {
       cloudWatchLogStreamName: props.cloudWatchLogStreamName,
       retentionPeriodHours: props.retentionPeriodHours,
     });
-    const msfIam = new MsfIam(this, "MsfIam", {
+    new MsfApp(this, "kinesis-to-s3-scala-app", {
       logGroupArn: msfInfra.logGroup.logGroupArn,
       bucketArn: msfInfra.s3Bucket.bucketArn,
       streamArn: msfInfra.kinesisStream.streamArn,
       roleName: props.roleName,
-    });
-    new MsfApp(this, "kinesis-to-s3-scala-app", {
       appName: props.appName,
       streamName: props.streamName,
       region: this.region,
@@ -45,7 +42,6 @@ export class MsfStack extends cdk.Stack {
       bucketName: props.bucketName,
       jarFile: props.jarFile,
       runtime: props.runtime,
-      role: msfIam.appRole,
       logGroup: msfInfra.logGroup, 
     });
   }

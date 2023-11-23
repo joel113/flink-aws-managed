@@ -18,12 +18,6 @@ new MsfStack(app, 'MsfKdsToS3Stack', {
   streamName: "msf-kds-to-s3-streamname",
   retentionPeriodHours: 24,
   numberOfItems: 100,
-  synthesizer: new BootstraplessStackSynthesizer({
-    templateBucketName: 'msf-cfn-template-bucket',
-    fileAssetBucketName: 'msf-bucket-${AWS::Region}',
-    fileAssetRegionSet: ['eu-central-1'],
-    fileAssetPrefix: 'msf/latest/'
-  }),
 });
 
 app.synth;

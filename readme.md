@@ -16,7 +16,13 @@ https://docs.aws.amazon.com/cli/latest/reference/kinesisanalyticsv2/
 
 https://docs.aws.amazon.com/cdk/api/v2/docs/aws-kinesisanalytics-flink-alpha-readme.html
 
-## AWS Managed Flink GIthub Repos
+### Custom Metrics
+
+https://docs.aws.amazon.com/managed-flink/latest/java/monitoring-metrics-custom.html#monitoring-metrics-custom-examples-viewing
+
+## AWS Managed Flink Github Repos
+
+https://github.com/aws-samples/amazon-kinesis-data-analytics-examples.git
 
 https://github.com/awslabs/managed-service-for-apache-flink-blueprints/tree/main
 
@@ -35,6 +41,34 @@ https://github.com/streaming-with-flink
 https://github.com/streaming-with-flink/examples-scala
 
 https://docs.aws.amazon.com/managed-flink/latest/java/how-sources.html
+
+## AWS Managed Flink
+
+https://aws.amazon.com/de/managed-service-apache-flink/
+
+https://docs.aws.amazon.com/managed-flink/latest/java/getting-started.html
+
+```text
+java.util.concurrent.CompletionException: org.apache.flink.client.program.ProgramInvocationException: The program's entry point class 'com.amazonaws.services.kinesisanalytics.StreamingJob' was not found in the jar file.
+at org.apache.flink.runtime.webmonitor.handlers.JarRunOverrideHandler.handleRequest(JarRunOverrideHandler.java:262)
+at org.apache.flink.runtime.webmonitor.handlers.JarRunOverrideHandler.handleRequest(JarRunOverrideHandler.java:88)
+at org.apache.flink.runtime.rest.handler.AbstractRestHandler.respondToRequest(AbstractRestHandler.java:83)
+at org.apache.flink.runtime.rest.handler.AbstractHandler.respondAsLeader(AbstractHandler.java:195)
+at org.apache.flink.runtime.rest.handler.LeaderRetrievalHandler.lambda$channelRead0$0(LeaderRetrievalHandler.java:83)
+at java.base/java.util.Optional.ifPresent(Optional.java:183)
+```
+
+## AWS Managed Flink with CDK
+
+https://docs.aws.amazon.com/cdk/api/v2/docs/aws-kinesisanalytics-flink-alpha-readme.html
+
+## AWS CDK
+
+https://github.com/aws-samples/aws-cdk-examples/tree/master/typescript
+
+https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html
+
+https://github.com/aws-samples/cdk-bootstrapless-synthesizer
 
 ## AWS CDK Stack and Stage Boundaries
 
